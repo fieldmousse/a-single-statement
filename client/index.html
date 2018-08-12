@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tile</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        #screen {
+            position: fixed;
+            top: 50px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .tile {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="screen"></div>
+    <input id="color" type="color" value="#ff0000">
+    <script> 
+        const screen = document.getElementById("screen");
+        const colorEl = document.getElementById("color");
+        const init = new XMLHttpRequest();
+        init.open("GET", "/tiles");
+        init.onloadend = () => {
+            const tiles = JSON.parse(init.responseText);
+            tiles.map(addTile);
+        };
+        init.send();
+        function addTile({ x, y, color }) {
+            const tile = document.createElement("div");
+            tile.className = "tile";
+            tile.style.backgroundColor = color;
+            tile.style.transform = `translate(${x * 100}px, ${y * 100}px)`;
+            screen.appendChild(tile);
+        }
+        function sendTile({ x, y, color }) {
+            const req = new XMLHttpRequest();
+            req.open("POST", "/tile");
+            req.setRequestHeader("Content-Type", "application/json");
+            req.send(JSON.stringify({ x, y, color }));
+        }
+        screen.addEventListener("click", ({ clientX, clientY }) => {
+            const color = colorEl.value || "yellow";
+            sendTile({ x: Math.trunc(clientX / 100), y: Math.trunc((clientY - 50) / 100), color });
+        })
+        const socket = io.connect();
+        socket.on('tile', addTile);
+    </script>
+</body>
+
+</html>
