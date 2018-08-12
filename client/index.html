@@ -40,7 +40,7 @@
             const tile = document.createElement("div");
             tile.className = "tile";
             tile.style.backgroundColor = color;
-            tile.style.transform = `translate(${x * 100}px, ${y * 100}px)`;
+            tile.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
             screen.appendChild(tile);
         }
         function sendTile({ x, y, color }) {
@@ -51,7 +51,7 @@
         }
         screen.addEventListener("click", ({ clientX, clientY }) => {
             const color = colorEl.value || "yellow";
-            sendTile({ x: Math.trunc(clientX / 100), y: Math.trunc((clientY - 50) / 100), color });
+            sendTile({ x: Math.trunc(clientX / 20), y: Math.trunc((clientY - 50) / 20), color });
         })
         const socket = io.connect();
         socket.on('tile', addTile);
